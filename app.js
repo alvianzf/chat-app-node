@@ -8,6 +8,12 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+var http = require('http').createServer(app);
+var io = require('socket.io')(http, {
+  cors: {
+    origins: ['http://localhost:8080']
+  }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -36,6 +42,14 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+// connect to a socket
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
 });
 
 module.exports = app;
